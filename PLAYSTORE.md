@@ -12,19 +12,21 @@
 - [ ] 앱/게임 구분: 앱, 무료
 
 ## 3. 패키지 업로드
-- [ ] `android/app/build/outputs/bundle/release/app-release.aab` 업로드 (Play 앱 서명 사용 — 처음 업로드 시 Google이 안내)
+- [ ] `store-assets/app-release.aab` 업로드 (Play 앱 서명 사용 — 처음 업로드 시 Google이 안내). 저장소엔 없고 로컬에만 있음 — 재생성: `npm run build && npx cap sync android && cd android && ./gradlew bundleRelease`
 - [ ] **주의**: 패키지 ID `com.ccdojo.app`는 한 번 업로드하면 영구 고정됩니다. 다른 ID를 원하면 업로드 *전에* `capacitor.config.ts`의 `appId`와 `android/app/build.gradle`의 `applicationId`를 함께 바꿔야 합니다.
 
-## 4. 스토어 등록정보
-- [ ] 짧은 설명 (80자 이내) — 예: "Claude Code 공식 문서를 이론·실습·반복 복습으로 체득하는 학습 앱"
-- [ ] 긴 설명 (4000자 이내)
-- [ ] 앱 아이콘 512×512 PNG — `assets/icon.png`를 512×512로 리사이즈해서 사용 가능 (이미 생성되어 있음)
-- [ ] 피처 그래픽 1024×500 PNG/JPG — 별도 제작 필요(이 저장소에는 없음)
-- [ ] 휴대폰 스크린샷 최소 2장(권장 4장 이상) — 에뮬레이터나 실기기에서 직접 캡처
+## 4. 스토어 등록정보 — `store-assets/`에 모두 준비됨
+- [ ] 짧은 설명 (80자 이내) — `store-assets/short-description.txt` (49자)
+- [ ] 긴 설명 (4000자 이내) — `store-assets/long-description.txt` (978자)
+- [ ] 앱 아이콘 512×512 PNG — `store-assets/icon-512.png`
+- [ ] 피처 그래픽 1024×500 PNG — `store-assets/feature-graphic.png`
+- [ ] 휴대폰 스크린샷 4장 — `store-assets/screenshots/01-dashboard.png` ~ `04-docs.png`
 - [ ] 앱 카테고리: 교육(Education)
 
-## 5. 개인정보처리방침
-- [ ] 개인정보처리방침 URL 필수. 이 앱은 모든 진도 데이터를 **기기 로컬(localStorage)에만** 저장하고 서버로 전송하지 않으므로, 그 사실을 명시한 간단한 페이지면 충분합니다. GitHub Pages나 무료 호스팅에 정적 페이지 하나만 올리면 됩니다.
+## 5. 개인정보처리방침 — `docs/privacy.html` 작성 완료, GitHub Pages 활성화만 하면 됨
+- [ ] 저장소 Settings → Pages → Source: "Deploy from a branch" → Branch `main` / `/docs` 선택
+- [ ] `docs/privacy.html`의 "문의" 섹션 이메일 플레이스홀더를 실제 연락처로 교체
+- [ ] 활성화 후 URL: `https://codebk4662.github.io/claudefit/privacy.html` — 이 URL을 Play Console에 등록
 
 ## 6. 콘텐츠 등급 설문
 - [ ] Play Console의 설문에 응답 (폭력/도박/사용자 생성 콘텐츠 등 없음 → 보통 "전체 이용가"로 책정됨)

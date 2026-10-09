@@ -38,3 +38,7 @@ android/keystore.properties
 *.jks
 android-release-key.*
 
+# 스토어 등록용 빌드 산출물(AAB) — 재빌드 가능, 용량 커서 커밋하지 않는다.
+# 나머지 store-assets(스크린샷/그래픽/설명 문구)는 커밋 대상.
+store-assets/*.aab
+
