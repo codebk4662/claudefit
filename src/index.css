@@ -1,0 +1,243 @@
+@import 'tailwindcss';
+
+/* ---- 디자인 토큰: 딥 차콜 + 샴페인 골드 (라이트=아이보리 기본, 다크는 media override) ---- */
+:root {
+  --bg: #fbf8f1;
+  --bg-raised: #ffffff;
+  --text: #1e1c16;
+  --text-dim: #85795f;
+  --border: #e7e0d2;
+  --accent: #96722a;
+  --accent-contrast: #1e1c16;
+  --accent-soft: rgba(150, 114, 42, 0.12);
+  --good: #2f7d4a;
+  --warn: #ad6a1e;
+  --bad: #b23b32;
+  --code-bg: #f2ede0;
+  /* 데일리 드릴 대시보드의 스킬 미터 — dataviz 스킬의 sequential(단일 hue) 처방, 골드로 통일 */
+  --viz-fill: #96722a;
+  --viz-track: #e8dab8;
+
+  --font-serif: 'Fraunces Variable', 'Noto Serif KR', serif;
+  --font-sans: 'Inter Variable', system-ui, 'Pretendard', 'Apple SD Gothic Neo', Roboto, sans-serif;
+
+  /* 네이티브 셸(Capacitor)의 상태바/제스처 바와 겹치지 않도록 — 브라우저에서는 전부 0px */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14130f;
+    --bg-raised: #1c1a15;
+    --text: #f2eee3;
+    --text-dim: #a69e8c;
+    --border: #332d22;
+    --accent: #c9a24b;
+    --accent-contrast: #1e1c16;
+    --accent-soft: rgba(201, 162, 75, 0.16);
+    --good: #6fbb7c;
+    --warn: #d99a4e;
+    --bad: #e0837a;
+    --code-bg: #241f17;
+    --viz-fill: #c9a24b;
+    --viz-track: #3a3221;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  /* 모바일 브라우저가 한 글자씩 색을 입힌 탭 하이라이트를 표시하지 않게 — 네이티브 앱 느낌 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+code,
+pre,
+kbd {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 로고 워드마크, 페이지/모듈 제목 — 세리프(라틴은 Fraunces, 한글은 Noto Serif KR로 자동 폴백) */
+.font-display {
+  font-family: var(--font-serif);
+  font-weight: 560;
+  letter-spacing: -0.01em;
+}
+
+/* 원문 마크다운 렌더 영역 */
+.prose-doc {
+  line-height: 1.75;
+}
+.prose-doc h1,
+.prose-doc h2,
+.prose-doc h3 {
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-weight: 560;
+  scroll-margin-top: 5rem;
+}
+.prose-doc h2 {
+  margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.4rem;
+}
+.prose-doc p,
+.prose-doc li {
+  color: var(--text);
+}
+.prose-doc code {
+  background: var(--code-bg);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.prose-doc pre {
+  background: var(--code-bg);
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.prose-doc pre code {
+  background: none;
+  padding: 0;
+}
+.prose-doc a {
+  color: var(--accent);
+}
+.prose-doc table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+}
+.prose-doc th,
+.prose-doc td {
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+.prose-doc img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+/* 원문은 Mintlify MDX라서 Note/Tip/Warning/Info/Tabs/Accordion 같은 커스텀 태그를 그대로 담고 있다.
+   react-markdown + rehype-raw가 이들을 알려지지 않은 HTML 요소로 통과시키므로, 태그 이름으로 직접
+   스타일을 입혀 콜아웃 박스처럼 보이게 한다. */
+.prose-doc note,
+.prose-doc tip,
+.prose-doc info,
+.prose-doc warning,
+.prose-doc frame {
+  display: block;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  font-size: 0.92em;
+}
+.prose-doc tip {
+  border-color: var(--good);
+}
+.prose-doc warning {
+  border-color: var(--warn);
+}
+.prose-doc note,
+.prose-doc info {
+  border-color: var(--accent);
+}
+.prose-doc note::before,
+.prose-doc tip::before,
+.prose-doc info::before,
+.prose-doc warning::before {
+  display: block;
+  font-weight: 600;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+  color: var(--text-dim);
+}
+.prose-doc note::before {
+  content: 'Note';
+}
+.prose-doc tip::before {
+  content: 'Tip';
+}
+.prose-doc info::before {
+  content: 'Info';
+}
+.prose-doc warning::before {
+  content: 'Warning';
+}
+
+.prose-doc tabs {
+  display: block;
+  margin: 1rem 0;
+}
+.prose-doc tab,
+.prose-doc accordion {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  margin: 0.5rem 0;
+}
+.prose-doc tab::before,
+.prose-doc accordion::before {
+  content: attr(title);
+  display: block;
+  font-weight: 600;
+  font-size: 0.85em;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+.prose-doc accordiongroup {
+  display: block;
+}
+.prose-doc cardgroup {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin: 1rem 0;
+}
+.prose-doc card {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+}
+.prose-doc card::before {
+  content: attr(title);
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+/* CodeMirror의 숨겨진 입력 요소도 16px 미만이면 모바일에서 포커스 시 자동 확대를 일으킨다.
+   보이는 코드 폰트는 CodeEditor.tsx의 테마가 따로 정하고, 이건 안전장치용. */
+.cm-editor textarea {
+  font-size: 16px !important;
+}

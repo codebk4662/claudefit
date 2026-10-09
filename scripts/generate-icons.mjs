@@ -1,0 +1,75 @@
+#!/usr/bin/env node
+/**
+ * assets/icon-*.svg (손으로 그린 코드 바벨 마크 — `<`/`>` 모양 플레이트를 단 역기)로부터
+ * 파비콘 / PWA 매니페스트 아이콘 / Apple touch icon / Capacitor 스플래시 소스를 렌더링한다.
+ * 안드로이드 SDK 없이 순수 Node(sharp)만으로 동작 — @capacitor/assets가 나중에
+ * assets/icon.png, icon-foreground.png, icon-background.png, splash*.png 를 읽어
+ * 안드로이드 전체 밀도별/적응형 아이콘·스플래시를 추가로 생성한다.
+ */
+import sharp from 'sharp'
+import { mkdir } from 'node:fs/promises'
+import path from 'node:path'
+
+const ROOT = path.resolve(import.meta.dirname, '..')
+const ASSETS = path.join(ROOT, 'assets')
+const PUBLIC = path.join(ROOT, 'public')
+
+const GOLD_DARK = '#C9A24B' // 다크 테마 악센트(샴페인 골드)
+const GOLD_LIGHT = '#96722A' // 라이트 테마 악센트(딥 골드)
+const BG_DARK = '#14130F'
+const BG_LIGHT = '#FBF8F1'
+
+function barbellSvg({ bg, stroke, size = 1024 }) {
+  const c = size / 2
+  const sw = size * 0.09765625 // 1024 기준 100 — 바/플레이트 공통 굵기(두꺼울수록 "꺾쇠"보다 "플레이트"로 읽힌다)
+  const barHalf = size * 0.15625 // 1024 기준 160 — 중앙에서 바 끝까지
+  const halfH = size * 0.107421875 // 1024 기준 110 — 플레이트(꺾쇠) 반높이: 짧게 눌러 화살표가 아닌 역기 플레이트로 보이게 함
+  const innerX = c - barHalf
+  const outerX = innerX - halfH
+  const innerXR = c + barHalf
+  const outerXR = innerXR + halfH
+  const barY = c - sw / 2
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}">
+    <rect width="${size}" height="${size}" fill="${bg}" />
+    <rect x="${innerX.toFixed(1)}" y="${barY.toFixed(1)}" width="${(barHalf * 2).toFixed(1)}" height="${sw.toFixed(1)}" rx="${(sw / 2).toFixed(1)}" fill="${stroke}" />
+    <path d="M ${innerX.toFixed(1)} ${(c - halfH).toFixed(1)} L ${outerX.toFixed(1)} ${c.toFixed(1)} L ${innerX.toFixed(1)} ${(c + halfH).toFixed(1)}"
+      fill="none" stroke="${stroke}" stroke-width="${sw.toFixed(1)}" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M ${innerXR.toFixed(1)} ${(c - halfH).toFixed(1)} L ${outerXR.toFixed(1)} ${c.toFixed(1)} L ${innerXR.toFixed(1)} ${(c + halfH).toFixed(1)}"
+      fill="none" stroke="${stroke}" stroke-width="${sw.toFixed(1)}" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>`
+}
+
+async function toPng(svgString, size, outPath) {
+  await sharp(Buffer.from(svgString)).resize(size, size).png().toFile(outPath)
+  console.log(`  ✓ ${path.relative(ROOT, outPath)} (${size}×${size})`)
+}
+
+async function main() {
+  await mkdir(PUBLIC, { recursive: true })
+  await mkdir(ASSETS, { recursive: true })
+
+  // 마스터(다크 배경 + 골드 코드 바벨) — 파비콘, PWA 아이콘, Apple touch icon, Capacitor 전경/배경/아이콘 소스
+  const masterSvg = barbellSvg({ bg: BG_DARK, stroke: GOLD_DARK })
+
+  console.log('[icons] PWA / 파비콘 세트')
+  await toPng(masterSvg, 192, path.join(PUBLIC, 'pwa-192.png'))
+  await toPng(masterSvg, 512, path.join(PUBLIC, 'pwa-512.png'))
+  await toPng(masterSvg, 512, path.join(PUBLIC, 'pwa-maskable-512.png')) // 이미 안전 영역 안에 그려져 있어 그대로 사용 가능
+  await toPng(masterSvg, 180, path.join(PUBLIC, 'apple-touch-icon.png'))
+
+  console.log('[icons] Capacitor 소스 (assets/) — @capacitor/assets generate 가 나중에 읽는다')
+  await toPng(masterSvg, 1024, path.join(ASSETS, 'icon.png'))
+  await toPng(barbellSvg({ bg: 'transparent', stroke: GOLD_DARK }), 1024, path.join(ASSETS, 'icon-foreground.png'))
+  await toPng(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="${BG_DARK}"/></svg>`, 1024, path.join(ASSETS, 'icon-background.png'))
+  await toPng(masterSvg, 2732, path.join(ASSETS, 'splash.png'))
+  await toPng(masterSvg, 2732, path.join(ASSETS, 'splash-dark.png'))
+  // 라이트 테마 스플래시 변형 — 앱 실행 직후 시스템이 라이트 모드면 이쪽을 쓴다
+  await toPng(barbellSvg({ bg: BG_LIGHT, stroke: GOLD_LIGHT }), 2732, path.join(ASSETS, 'splash-light.png'))
+
+  console.log('[icons] 완료')
+}
+
+main().catch((e) => {
+  console.error('[icons] 실패:', e)
+  process.exit(1)
+})

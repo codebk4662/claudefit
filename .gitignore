@@ -1,0 +1,40 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# 공식 문서 원문 캐시 — 재배포하지 않음, npm run sync:docs 로 각자 받는다
+public/content/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Android (Capacitor) — 네이티브 빌드 산출물과 서명 키는 커밋하지 않는다.
+# android/ 자체(프로젝트 구조)는 커밋 대상이지만 빌드/캐시/로컬 설정과 keystore는 제외한다.
+android/app/build/
+android/build/
+android/.gradle/
+android/captures/
+android/local.properties
+android/keystore.properties
+*.keystore
+*.jks
+android-release-key.*
+
