@@ -21,11 +21,14 @@ interface ProgressState {
   labAttempts: Record<string, LabAttemptRecord[]>
   srs: Record<string, SrsCard>
   streak: StreakState
+  /** 원문 라이브러리에서 한 번이라도 연 문서 slug 집합 — 읽음 표시용 */
+  readDocSlugs: Record<string, true>
 
   markModuleStatus: (moduleId: string, status: ModuleStatus) => void
   /** skills는 mastery 계산에 쓰이지 않고(ALL_ITEMS에서 역조회) 호출부 타입 체크용으로만 받는다. */
   recordItemAttempt: (itemId: string, difficulty: 1 | 2 | 3, correct: boolean) => void
   recordLabAttempt: (labId: string, passed: boolean) => void
+  markDocRead: (slug: string) => void
   bumpStreak: () => void
   resetAll: () => void
   exportJson: () => string
@@ -46,8 +49,11 @@ export const useProgress = create<ProgressState>()(
       labAttempts: {},
       srs: {},
       streak: { count: 0, lastDay: null },
+      readDocSlugs: {},
 
       markModuleStatus: (moduleId, status) => set((s) => ({ moduleStatus: { ...s.moduleStatus, [moduleId]: status } })),
+
+      markDocRead: (slug) => set((s) => (s.readDocSlugs[slug] ? s : { readDocSlugs: { ...s.readDocSlugs, [slug]: true } })),
 
       recordItemAttempt: (itemId, difficulty, correct) => {
         set((s) => {
@@ -86,11 +92,11 @@ export const useProgress = create<ProgressState>()(
         })
       },
 
-      resetAll: () => set({ moduleStatus: {}, itemAttempts: {}, labAttempts: {}, srs: {}, streak: { count: 0, lastDay: null } }),
+      resetAll: () => set({ moduleStatus: {}, itemAttempts: {}, labAttempts: {}, srs: {}, streak: { count: 0, lastDay: null }, readDocSlugs: {} }),
 
       exportJson: () => {
-        const { moduleStatus, itemAttempts, labAttempts, srs, streak } = get()
-        return JSON.stringify({ version: EXPORT_VERSION, exportedAt: new Date().toISOString(), moduleStatus, itemAttempts, labAttempts, srs, streak }, null, 2)
+        const { moduleStatus, itemAttempts, labAttempts, srs, streak, readDocSlugs } = get()
+        return JSON.stringify({ version: EXPORT_VERSION, exportedAt: new Date().toISOString(), moduleStatus, itemAttempts, labAttempts, srs, streak, readDocSlugs }, null, 2)
       },
 
       importJson: (json) => {
@@ -103,6 +109,7 @@ export const useProgress = create<ProgressState>()(
             labAttempts: data.labAttempts ?? {},
             srs: data.srs ?? {},
             streak: data.streak ?? { count: 0, lastDay: null },
+            readDocSlugs: data.readDocSlugs ?? {},
           })
           return { ok: true }
         } catch (e) {

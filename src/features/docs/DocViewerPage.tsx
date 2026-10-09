@@ -7,6 +7,7 @@ import rehypeSlug from 'rehype-slug'
 import { loadDocMarkdown, loadDocsIndex, type DocIndexEntry } from '@/lib/docsClient'
 import { stripFrontmatterNotice } from '@/lib/docText'
 import { Card, Pill } from '@/ui/common'
+import { useProgress } from '@/store/progress'
 
 export function DocViewerPage() {
   const { slug = '' } = useParams<{ slug: string }>()
@@ -14,6 +15,7 @@ export function DocViewerPage() {
   const [md, setMd] = useState<string | null>(null)
   const [meta, setMeta] = useState<DocIndexEntry | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const markDocRead = useProgress((s) => s.markDocRead)
 
   useEffect(() => {
     setMd(null)
@@ -22,9 +24,10 @@ export function DocViewerPage() {
       .then(([text, index]) => {
         setMd(stripFrontmatterNotice(text))
         setMeta(index.find((d) => d.slug === slug) ?? null)
+        markDocRead(slug)
       })
       .catch((e: Error) => setError(e.message))
-  }, [slug])
+  }, [slug, markDocRead])
 
   useEffect(() => {
     if (!md || !location.hash) return

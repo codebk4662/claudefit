@@ -184,5 +184,5 @@ function TerminalLine({ line, prompt }: { line: Line; prompt: string }) {
 }
 
 function Kbd({ children }: { children: string }) {
-  return <kbd className="px-1.5 py-0.5 rounded border border-[var(--border)] bg-[var(--code-bg)] text-[11px] font-mono">{children}</kbd>
+  return <kbd className="px-1.5 py-0.5 rounded border border-[var(--border)] bg-[var(--code-bg)] text-sm font-mono">{children}</kbd>
 }

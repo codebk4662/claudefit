@@ -5,12 +5,13 @@
 export function MasteryBar({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-xs text-[var(--text-dim)] w-36 shrink-0 truncate" title={label}>
+      <span className="text-sm text-[var(--text-dim)] w-36 shrink-0 truncate" title={label}>
         {label}
       </span>
-      <div className="flex-1 h-3 rounded-full overflow-hidden" style={{ background: 'var(--viz-track)' }} role="img" aria-label={`${label} 숙련도 ${value}%`}>
+      {/* 라벨/수치 글씨를 14px 이상으로 키운 만큼, 막대는 h-3→h-2로 가늘게 눌러 균형을 맞춘다 */}
+      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--viz-track)' }} role="img" aria-label={`${label} 숙련도 ${value}%`}>
         <div
-          className="h-3"
+          className="h-2"
           style={{
             width: `${Math.max(value === 0 ? 0 : 3, value)}%`,
             background: 'var(--viz-fill)',
@@ -18,7 +19,7 @@ export function MasteryBar({ label, value }: { label: string; value: number }) {
           }}
         />
       </div>
-      <span className="text-xs tabular-nums w-9 text-right text-[var(--text-dim)]">{value}%</span>
+      <span className="text-sm tabular-nums w-10 text-right text-[var(--text-dim)]">{value}%</span>
     </div>
   )
 }

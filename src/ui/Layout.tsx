@@ -1,11 +1,13 @@
 import { NavLink, Outlet } from 'react-router'
 import { Logo } from './Logo'
 
+// tabLabel: 하단 탭바 전용 짧은 라벨 — 16px로 커진 글씨가 좁은 탭 폭에서 줄바꿈되지 않도록.
+// 데스크톱 사이드바는 폭이 넉넉해 항상 label(전체 이름)을 쓴다.
 const NAV = [
-  { to: '/', label: '대시보드', icon: '🏠' },
-  { to: '/drill', label: '데일리 드릴', icon: '⚡' },
-  { to: '/learn', label: '학습 트랙', icon: '📚' },
-  { to: '/docs', label: '원문 라이브러리', icon: '🔎' },
+  { to: '/', label: '대시보드', tabLabel: '대시보드', icon: '🏠' },
+  { to: '/drill', label: '데일리 드릴', tabLabel: '데일리 드릴', icon: '⚡' },
+  { to: '/learn', label: '학습 트랙', tabLabel: '학습 트랙', icon: '📚' },
+  { to: '/docs', label: '원문 라이브러리', tabLabel: '라이브러리', icon: '🔎' },
 ] as const
 
 export function Layout() {
@@ -17,7 +19,7 @@ export function Layout() {
           <Logo size={28} />
           <div>
             <div className="font-display text-base leading-tight">클로드핏</div>
-            <p className="text-[11px] text-[var(--text-dim)] leading-tight">Claude Code 학습 트레이닝</p>
+            <p className="text-sm text-[var(--text-dim)] leading-tight">Claude Code 학습 트레이닝</p>
           </div>
         </div>
         <nav className="p-2 flex flex-col gap-0.5">
@@ -42,7 +44,7 @@ export function Layout() {
             </NavLink>
           ))}
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-3 text-[11px] text-[var(--text-dim)] border-t border-[var(--border)]">
+        <div className="absolute bottom-0 left-0 right-0 p-3 text-sm text-[var(--text-dim)] border-t border-[var(--border)]">
           원문: code.claude.com/docs/ko · 로컬 캐시, 비공식 학습 도구
         </div>
       </aside>
@@ -56,30 +58,30 @@ export function Layout() {
           <div className="font-display text-base">클로드핏</div>
         </header>
 
-        {/* 모바일 하단 탭바와 겹치지 않도록 여유 패딩 (세이프에어리어 포함) */}
-        <main className="flex-1 min-w-0" style={{ paddingBottom: 'calc(4.25rem + var(--safe-bottom))' }}>
+        {/* 모바일 하단 탭바와 겹치지 않도록 여유 패딩 (세이프에어리어 포함) — 탭 라벨이 16px로 커진 만큼 늘림 */}
+        <main className="flex-1 min-w-0" style={{ paddingBottom: 'calc(4.75rem + var(--safe-bottom))' }}>
           <Outlet />
         </main>
 
         <nav
-          className="md:hidden fixed bottom-0 left-0 right-0 z-10 bg-[var(--bg-raised)]/95 backdrop-blur border-t border-[var(--border)] flex"
-          style={{ paddingBottom: 'var(--safe-bottom)' }}
+          className="md:hidden fixed bottom-0 left-0 right-0 z-10 bg-[var(--bg-raised)]/95 backdrop-blur border-t border-[var(--border)] flex px-1.5 py-1.5"
+          style={{ paddingBottom: 'calc(0.375rem + var(--safe-bottom))' }}
         >
           {NAV.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/'}
-              className={({ isActive }) =>
-                `flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium transition-colors ${
-                  isActive ? 'text-[var(--accent)]' : 'text-[var(--text-dim)]'
-                }`
-              }
-            >
-              <span className="text-lg leading-none" aria-hidden>
-                {item.icon}
-              </span>
-              {item.label}
+            <NavLink key={item.to} to={item.to} end={item.to === '/'} className="flex-1 flex justify-center">
+              {({ isActive }) => (
+                // 선택된 탭은 음영(accent-soft) 배경으로 하이라이트 — 라벨은 본문(14px)보다 큰 16px
+                <span
+                  className={`flex flex-col items-center gap-0.5 w-full px-1 py-1.5 rounded-xl text-base font-medium leading-none whitespace-nowrap transition-colors ${
+                    isActive ? 'bg-[var(--accent-soft)] text-[var(--accent)]' : 'text-[var(--text-dim)]'
+                  }`}
+                >
+                  <span className="text-lg leading-none" aria-hidden>
+                    {item.icon}
+                  </span>
+                  <span className="mt-0.5">{item.tabLabel}</span>
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>

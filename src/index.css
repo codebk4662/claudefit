@@ -1,5 +1,12 @@
 @import 'tailwindcss';
 
+/* 모바일 가독성 — 본문 어디에도 14px(14sp) 미만 글씨가 없도록 text-xs 자체를 text-sm과 동일하게 올린다.
+   (개별 text-[11px] 등 임의 크기는 각 컴포넌트에서 직접 text-sm 이상으로 교체) */
+@theme {
+  --text-xs: 0.875rem;
+  --text-xs--line-height: calc(1.25 / 0.875);
+}
+
 /* ---- 디자인 토큰: 딥 차콜 + 샴페인 골드 (라이트=아이보리 기본, 다크는 media override) ---- */
 :root {
   --bg: #fbf8f1;

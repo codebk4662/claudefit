@@ -6,13 +6,13 @@ import { SKILLS } from '@/curriculum/skills'
 import { ALL_ITEMS } from '@/curriculum/items'
 import { pickDailyDrillItems } from '@/engine/scheduler'
 import { useProgress, computeMasteryBySkill } from '@/store/progress'
-import { Card, PageHeader, Pill, PrimaryButton, SecondaryButton } from '@/ui/common'
+import { Card, PageHeader, Pill, PrimaryButton } from '@/ui/common'
 import { MasteryBar } from '@/ui/MasteryBar'
 
 export function DashboardPage() {
   const navigate = useNavigate()
   const state = useProgress()
-  const { moduleStatus, itemAttempts, labAttempts, srs, streak, exportJson, importJson } = state
+  const { moduleStatus, itemAttempts, labAttempts, srs, streak } = state
 
   const masteryBySkill = useMemo(() => computeMasteryBySkill({ itemAttempts, labAttempts }), [itemAttempts, labAttempts])
 
@@ -32,45 +32,9 @@ export function DashboardPage() {
     return [...byGroup.entries()]
   }, [])
 
-  function handleExport() {
-    const blob = new Blob([exportJson()], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `claudefit-progress-${new Date().toISOString().slice(0, 10)}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  function handleImport() {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'application/json'
-    input.onchange = () => {
-      const file = input.files?.[0]
-      if (!file) return
-      const reader = new FileReader()
-      reader.onload = () => {
-        const result = importJson(String(reader.result))
-        if (!result.ok) alert(`가져오기 실패: ${result.error}`)
-      }
-      reader.readAsText(file)
-    }
-    input.click()
-  }
-
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <PageHeader
-        title="대시보드"
-        description="진도, 숙련도, 오늘의 복습을 한눈에 봅니다."
-        actions={
-          <div className="flex gap-2">
-            <SecondaryButton onClick={handleImport}>진도 가져오기</SecondaryButton>
-            <SecondaryButton onClick={handleExport}>진도 내보내기</SecondaryButton>
-          </div>
-        }
-      />
+      <PageHeader title="대시보드" description="진도, 숙련도, 오늘의 복습을 한눈에 봅니다." />
 
       <div className="grid sm:grid-cols-3 gap-3 mb-8">
         <StatTile label="완료한 모듈" value={`${doneModules} / ${ALL_MODULES.length}`} />

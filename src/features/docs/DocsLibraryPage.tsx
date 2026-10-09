@@ -3,12 +3,14 @@ import { Link } from 'react-router'
 import { loadDocsIndex, type DocIndexEntry } from '@/lib/docsClient'
 import { useSearchIndex } from '@/lib/useSearchIndex'
 import { PageHeader, Card, Pill } from '@/ui/common'
+import { useProgress } from '@/store/progress'
 
 export function DocsLibraryPage() {
   const [docs, setDocs] = useState<DocIndexEntry[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const { index, loading: indexLoading } = useSearchIndex()
+  const readDocSlugs = useProgress((s) => s.readDocSlugs)
 
   useEffect(() => {
     loadDocsIndex()
@@ -63,10 +65,13 @@ export function DocsLibraryPage() {
           <p className="text-sm text-[var(--text-dim)]">{hits.length}개 결과</p>
           {hits.map((h) => (
             <Link key={h.id} to={`/docs/${h.id}`} className="block">
-              <Card className="hover:border-[var(--accent)] transition-colors">
+              <Card className="hover:border-[var(--accent)] transition-colors relative">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium">{h.title}</span>
-                  {h.group && <Pill>{h.group}</Pill>}
+                  <div className="flex items-center gap-2 shrink-0">
+                    {readDocSlugs[h.id] && <ReadBadge />}
+                    {h.group && <Pill>{h.group}</Pill>}
+                  </div>
                 </div>
                 <p className="text-sm text-[var(--text-dim)] mt-1 line-clamp-2">{h.snippet}</p>
               </Card>
@@ -80,13 +85,19 @@ export function DocsLibraryPage() {
         <div className="space-y-8">
           {grouped.map(([group, items]) => (
             <section key={group}>
-              <h2 className="text-sm font-semibold text-[var(--text-dim)] uppercase tracking-wide mb-3">{group}</h2>
+              {/* 스크롤 시 현재 섹션 제목이 상단(모바일 헤더 바로 아래 / 데스크톱은 맨 위)에 고정된다 */}
+              <h2 className="sticky top-14 md:top-0 z-10 -mx-6 px-6 py-2 bg-[var(--bg)]/95 backdrop-blur text-lg font-bold text-[var(--text)] mb-1">
+                {group}
+              </h2>
               <div className="grid sm:grid-cols-2 gap-2">
                 {items.map((d) => (
                   <Link key={d.slug} to={`/docs/${d.slug}`} className="block">
-                    <Card className="hover:border-[var(--accent)] transition-colors h-full">
-                      <span className="font-medium text-sm">{d.title}</span>
-                      {d.description && <p className="text-xs text-[var(--text-dim)] mt-1 line-clamp-2">{d.description}</p>}
+                    <Card className="hover:border-[var(--accent)] transition-colors h-full relative">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-medium text-sm">{d.title}</span>
+                        {readDocSlugs[d.slug] && <ReadBadge />}
+                      </div>
+                      {d.description && <p className="text-sm text-[var(--text-dim)] mt-1 line-clamp-2">{d.description}</p>}
                     </Card>
                   </Link>
                 ))}
@@ -96,5 +107,18 @@ export function DocsLibraryPage() {
         </div>
       )}
     </div>
+  )
+}
+
+/** 한 번이라도 연 문서에 붙는 읽음 표시 */
+function ReadBadge() {
+  return (
+    <span
+      className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs shrink-0 bg-[color-mix(in_srgb,var(--good)_16%,transparent)] text-[var(--good)]"
+      title="읽음"
+      aria-label="읽음"
+    >
+      ✓
+    </span>
   )
 }
