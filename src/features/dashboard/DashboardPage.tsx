@@ -4,7 +4,8 @@ import { ALL_MODULES } from '@/curriculum/modules'
 import { TRACKS } from '@/curriculum/tracks'
 import { SKILLS } from '@/curriculum/skills'
 import { ALL_ITEMS } from '@/curriculum/items'
-import { pickDailyDrillItems } from '@/engine/scheduler'
+import { ALL_LABS } from '@/curriculum/registry'
+import { pickDailyDrillItems, pickDailyDrillLabs } from '@/engine/scheduler'
 import { useProgress, computeMasteryBySkill } from '@/store/progress'
 import { Card, PageHeader, Pill, PrimaryButton } from '@/ui/common'
 import { MasteryBar } from '@/ui/MasteryBar'
@@ -18,6 +19,10 @@ export function DashboardPage() {
 
   const dueItemIds = useMemo(
     () => pickDailyDrillItems({ allItems: ALL_ITEMS, srsByItemId: srs, masteryBySkill, limit: 10 }),
+    [srs, masteryBySkill],
+  )
+  const dueLabs = useMemo(
+    () => pickDailyDrillLabs({ allLabs: ALL_LABS, srsByItemId: srs, masteryBySkill, limit: 2 }),
     [srs, masteryBySkill],
   )
 
@@ -39,7 +44,7 @@ export function DashboardPage() {
       <div className="grid sm:grid-cols-3 gap-3 mb-8">
         <StatTile label="완료한 모듈" value={`${doneModules} / ${ALL_MODULES.length}`} />
         <StatTile label="연속 학습일" value={`${streak.count}일`} />
-        <StatTile label="오늘 복습 대상" value={`${dueItemIds.length}문항`} />
+        <StatTile label="오늘 복습 대상" value={`퀴즈 ${dueItemIds.length}문항 · 실습 ${dueLabs.length}개`} />
       </div>
 
       <Card className="mb-8">

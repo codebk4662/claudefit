@@ -8,6 +8,9 @@ import { loadDocMarkdown, loadDocsIndex, type DocIndexEntry } from '@/lib/docsCl
 import { stripFrontmatterNotice } from '@/lib/docText'
 import { Card, Pill } from '@/ui/common'
 import { useProgress } from '@/store/progress'
+import { modulesByDocSlug } from '@/curriculum/registry'
+import { trackById } from '@/curriculum/tracks'
+import { hapticSelect } from '@/lib/haptics'
 
 export function DocViewerPage() {
   const { slug = '' } = useParams<{ slug: string }>()
@@ -68,12 +71,41 @@ export function DocViewerPage() {
       {md === null ? (
         <p className="text-[var(--text-dim)] mt-4">불러오는 중…</p>
       ) : (
-        <article className="prose-doc mt-4">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeSlug]}>
-            {md}
-          </ReactMarkdown>
-        </article>
+        <>
+          <article className="prose-doc mt-4">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeSlug]}>
+              {md}
+            </ReactMarkdown>
+          </article>
+          <RelatedModules slug={slug} />
+        </>
       )}
     </div>
+  )
+}
+
+/** 이 문서를 핵심 근거로 쓰는 학습 모듈 — 읽고 나서 바로 퀴즈·실습으로 이어가도록 */
+function RelatedModules({ slug }: { slug: string }) {
+  const modules = modulesByDocSlug.get(slug)
+  if (!modules || modules.length === 0) return null
+
+  return (
+    <Card className="mt-6">
+      <h2 className="font-semibold mb-1">연관 학습 트랙</h2>
+      <p className="text-sm text-[var(--text-dim)] mb-3">이 문서를 근거로 삼는 모듈입니다. 읽은 내용을 퀴즈·실습으로 바로 확인해보세요.</p>
+      <div className="flex flex-col gap-2">
+        {modules.map((m) => (
+          <Link
+            key={m.id}
+            to={`/learn/${m.id}`}
+            onClick={hapticSelect}
+            className="flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border border-[var(--border)] text-sm hover:border-[var(--accent)] transition-colors"
+          >
+            <span className="font-medium">{m.title}</span>
+            <span className="text-[var(--text-dim)] shrink-0">{trackById(m.trackId).title} →</span>
+          </Link>
+        ))}
+      </div>
+    </Card>
   )
 }
