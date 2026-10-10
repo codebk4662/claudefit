@@ -64,9 +64,24 @@ function parseLlmsIndex(md) {
   return pages
 }
 
+const UA = { 'User-Agent': 'cc-dojo-doc-sync/1.0' }
+
 async function fetchText(url) {
-  const res = await fetch(url, { headers: { 'User-Agent': 'cc-dojo-doc-sync/1.0' } })
+  const res = await fetch(url, { headers: UA })
   if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${url}`)
+
+  // changelog처럼 일부 문서는 code.claude.com이 GitHub blob 페이지(렌더링된 HTML)로
+  // 리다이렉트한다 — fetch()가 그 리다이렉트를 따라가 버리면 마크다운 대신 HTML이 저장된다.
+  // raw.githubusercontent.com의 원문으로 다시 받는다.
+  const blobMatch = /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/.exec(res.url)
+  if (blobMatch) {
+    const [, owner, repo, rest] = blobMatch
+    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${rest}`
+    const rawRes = await fetch(rawUrl, { headers: UA })
+    if (!rawRes.ok) throw new Error(`${rawRes.status} ${rawRes.statusText} for ${rawUrl}`)
+    return rawRes.text()
+  }
+
   return res.text()
 }
 
