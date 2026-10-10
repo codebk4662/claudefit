@@ -137,6 +137,13 @@ export const TERMINAL_SCENARIOS: Scenario[] = [
         accept: { mention: 'README.md' },
         systemOutput: ['@README.md 참조됨 — 두 파일을 비교합니다.'],
       },
+      {
+        id: 'paste-image',
+        goal: '에러 메시지를 캡처한 스크린샷을 클립보드에서 붙여넣어 프롬프트에 첨부하세요.',
+        hints: ['키보드 단축키입니다, 명령이나 멘션이 아닙니다.', '클립보드의 이미지를 붙여넣는 단축키입니다 (Mac: Cmd+V, Windows/WSL: Alt+V).', '정답: Ctrl+V'],
+        accept: { key: 'Ctrl+V' },
+        systemOutput: ['[Image #1] 칩이 프롬프트에 삽입되었습니다 — 이제 이 스크린샷을 참조하며 대화할 수 있습니다.'],
+      },
     ],
   },
   {

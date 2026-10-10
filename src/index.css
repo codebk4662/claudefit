@@ -248,3 +248,18 @@ kbd {
 .cm-editor textarea {
   font-size: 16px !important;
 }
+
+/* 터미널 실습의 Claude 캐릭터 — 단계를 통과하면 짧게 "응답 중"처럼 바깥으로 번지며 사라진다 */
+@keyframes claude-avatar-ping {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+.claude-avatar-ping {
+  animation: claude-avatar-ping 0.7s ease-out;
+}

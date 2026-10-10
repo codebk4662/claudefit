@@ -5,6 +5,7 @@ import { gradeTask } from '@/engine/forge/grade'
 import type { GradeOutcome } from '@/engine/forge/types'
 import { useProgress } from '@/store/progress'
 import { Card, PageHeader, PrimaryButton, SecondaryButton, DocRefLink } from '@/ui/common'
+import { hapticSuccess, hapticFailure } from '@/lib/haptics'
 import { CodeEditor } from '@/ui/CodeEditor'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -31,10 +32,14 @@ export function ForgePage() {
   const grade = () => {
     const result = gradeTask(task, source)
     setOutcome(result)
-    if (result.passed && !passedOnce) {
-      setPassedOnce(true)
-      recordLabAttempt(task.id, true)
-    } else if (!result.passed) {
+    if (result.passed) {
+      hapticSuccess()
+      if (!passedOnce) {
+        setPassedOnce(true)
+        recordLabAttempt(task.id, true)
+      }
+    } else {
+      hapticFailure()
       recordLabAttempt(task.id, false)
     }
   }
@@ -71,7 +76,6 @@ export function ForgePage() {
       <div className="mt-3 flex gap-2 flex-wrap">
         <PrimaryButton onClick={grade}>채점하기</PrimaryButton>
         <SecondaryButton onClick={reset}>초기화</SecondaryButton>
-        <SecondaryButton onClick={() => setShowSolution((v) => !v)}>{showSolution ? '모범 답안 숨기기' : '막혔다면: 모범 답안 보기'}</SecondaryButton>
         {passedOnce && <SecondaryButton onClick={() => navigate(-1)}>돌아가기</SecondaryButton>}
       </div>
 
@@ -104,12 +108,16 @@ export function ForgePage() {
         </Card>
       )}
 
-      {showSolution && (
-        <Card className="mt-4">
-          <p className="text-xs uppercase tracking-wide text-[var(--text-dim)] mb-2">모범 답안</p>
-          <pre className="text-xs bg-[var(--code-bg)] rounded-lg p-3 overflow-x-auto">{task.sampleSolution}</pre>
-        </Card>
-      )}
+      {/* 실습화면 맨 하단의 모범답안 — 누를 때까지는 스포일러처럼 가려둔다 */}
+      <div className="mt-6 pt-4 border-t border-[var(--border)]">
+        <SecondaryButton onClick={() => setShowSolution((v) => !v)}>{showSolution ? '모범답안 숨기기' : '모범답안 보기'}</SecondaryButton>
+        {showSolution && (
+          <Card className="mt-3">
+            <p className="text-sm uppercase tracking-wide text-[var(--text-dim)] mb-2">모범답안</p>
+            <pre className="text-sm bg-[var(--code-bg)] rounded-lg p-3 overflow-x-auto">{task.sampleSolution}</pre>
+          </Card>
+        )}
+      </div>
     </div>
   )
 }
