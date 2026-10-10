@@ -32,4 +32,6 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- @capacitor/haptics: 일부 OS 버전/기기에서 impact()가 내부적으로 Vibrator로 폴백할 때 필요 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 </manifest>

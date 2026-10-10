@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router'
 import { Logo } from './Logo'
+import { hapticSelect } from '@/lib/haptics'
 
 // tabLabel: 하단 탭바 전용 짧은 라벨 — 16px로 커진 글씨가 좁은 탭 폭에서 줄바꿈되지 않도록.
 // 데스크톱 사이드바는 폭이 넉넉해 항상 label(전체 이름)을 쓴다.
@@ -28,6 +29,7 @@ export function Layout() {
               key={item.to}
               to={item.to}
               end={item.to === '/'}
+              onClick={hapticSelect}
               className={({ isActive }) =>
                 `relative flex items-center gap-3 pl-4 pr-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive ? 'text-[var(--accent)] bg-[var(--accent-soft)]' : 'text-[var(--text-dim)] hover:bg-[var(--code-bg)] hover:text-[var(--text)]'
@@ -68,7 +70,7 @@ export function Layout() {
           style={{ paddingBottom: 'calc(0.375rem + var(--safe-bottom))' }}
         >
           {NAV.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.to === '/'} className="flex-1 flex justify-center">
+            <NavLink key={item.to} to={item.to} end={item.to === '/'} onClick={hapticSelect} className="flex-1 flex justify-center">
               {({ isActive }) => (
                 // 선택된 탭은 음영(accent-soft) 배경으로 하이라이트 — 라벨은 본문(14px)보다 큰 16px
                 <span

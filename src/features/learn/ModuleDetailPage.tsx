@@ -7,6 +7,7 @@ import { trackById } from '@/curriculum/tracks'
 import { resolveLab } from '@/curriculum/registry'
 import { useProgress } from '@/store/progress'
 import { Card, Pill, PageHeader, PrimaryButton, SecondaryButton, DocRefLink } from '@/ui/common'
+import { hapticSelect } from '@/lib/haptics'
 
 export function ModuleDetailPage() {
   const { moduleId = '' } = useParams<{ moduleId: string }>()
@@ -80,7 +81,13 @@ export function ModuleDetailPage() {
         <Card>
           <h2 className="font-semibold mb-1">퀴즈</h2>
           <p className="text-sm text-[var(--text-dim)] mb-3">{mod.itemIds.length}개 문항으로 이해도를 확인합니다.</p>
-          <PrimaryButton onClick={() => navigate(`/quiz/${mod.id}`)} disabled={mod.itemIds.length === 0}>
+          <PrimaryButton
+            onClick={() => {
+              hapticSelect()
+              navigate(`/quiz/${mod.id}`)
+            }}
+            disabled={mod.itemIds.length === 0}
+          >
             퀴즈 시작 →
           </PrimaryButton>
         </Card>
@@ -94,7 +101,13 @@ export function ModuleDetailPage() {
                 if (!lab) return null
                 const to = kind === 'terminal' ? `/terminal/${labId}` : `/forge/${labId}`
                 return (
-                  <SecondaryButton key={labId} onClick={() => navigate(to)}>
+                  <SecondaryButton
+                    key={labId}
+                    onClick={() => {
+                      hapticSelect()
+                      navigate(to)
+                    }}
+                  >
                     {kind === 'terminal' ? '🖥️' : '🛠️'} {lab.title}
                   </SecondaryButton>
                 )

@@ -3,6 +3,7 @@ import { TRACKS } from '@/curriculum/tracks'
 import { ALL_MODULES } from '@/curriculum/modules'
 import { useProgress } from '@/store/progress'
 import { Card, Pill, PageHeader, ProgressBar } from '@/ui/common'
+import { hapticSelect } from '@/lib/haptics'
 
 const STATUS_LABEL: Record<string, string> = { 'not-started': '시작 전', learning: '학습 중', done: '완료' }
 const STATUS_TONE: Record<string, 'default' | 'accent' | 'good'> = { 'not-started': 'default', learning: 'accent', done: 'good' }
@@ -36,7 +37,7 @@ export function TrackListPage() {
                 {modules.map((m) => {
                   const status = moduleStatus[m.id] ?? 'not-started'
                   return (
-                    <Link key={m.id} to={`/learn/${m.id}`} className="block">
+                    <Link key={m.id} to={`/learn/${m.id}`} onClick={hapticSelect} className="block">
                       <Card className="hover:border-[var(--accent)] transition-colors h-full">
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-medium text-sm">{m.title}</span>

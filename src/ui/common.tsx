@@ -69,6 +69,41 @@ export function SecondaryButton({ children, onClick, disabled }: { children: Rea
   )
 }
 
+/** 파괴적/되돌리기 어려운 동작(예: 앱 종료) 전에 확인을 받는 작은 모달 */
+export function ConfirmModal({
+  title,
+  description,
+  confirmLabel = '확인',
+  cancelLabel = '취소',
+  onConfirm,
+  onCancel,
+}: {
+  title: string
+  description?: string
+  confirmLabel?: string
+  cancelLabel?: string
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/40" onClick={onCancel}>
+      <div
+        className="w-full max-w-sm rounded-2xl border border-[var(--border)] bg-[var(--bg-raised)] p-5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.3)]"
+        onClick={(e) => e.stopPropagation()}
+        role="alertdialog"
+        aria-modal="true"
+      >
+        <p className="font-semibold mb-1">{title}</p>
+        {description && <p className="text-sm text-[var(--text-dim)] mb-4">{description}</p>}
+        <div className="flex justify-end gap-2 mt-4">
+          <SecondaryButton onClick={onCancel}>{cancelLabel}</SecondaryButton>
+          <PrimaryButton onClick={onConfirm}>{confirmLabel}</PrimaryButton>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: ReactNode }) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-3 mb-6">

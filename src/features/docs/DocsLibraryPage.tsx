@@ -4,6 +4,7 @@ import { loadDocsIndex, type DocIndexEntry } from '@/lib/docsClient'
 import { useSearchIndex } from '@/lib/useSearchIndex'
 import { PageHeader, Card, Pill } from '@/ui/common'
 import { useProgress } from '@/store/progress'
+import { hapticSelect } from '@/lib/haptics'
 
 export function DocsLibraryPage() {
   const [docs, setDocs] = useState<DocIndexEntry[] | null>(null)
@@ -64,7 +65,7 @@ export function DocsLibraryPage() {
         <div className="space-y-2 mb-8">
           <p className="text-sm text-[var(--text-dim)]">{hits.length}개 결과</p>
           {hits.map((h) => (
-            <Link key={h.id} to={`/docs/${h.id}`} className="block">
+            <Link key={h.id} to={`/docs/${h.id}`} onClick={hapticSelect} className="block">
               <Card className="hover:border-[var(--accent)] transition-colors relative">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium">{h.title}</span>
@@ -91,7 +92,7 @@ export function DocsLibraryPage() {
               </h2>
               <div className="grid sm:grid-cols-2 gap-2">
                 {items.map((d) => (
-                  <Link key={d.slug} to={`/docs/${d.slug}`} className="block">
+                  <Link key={d.slug} to={`/docs/${d.slug}`} onClick={hapticSelect} className="block">
                     <Card className="hover:border-[var(--accent)] transition-colors h-full relative">
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-medium text-sm">{d.title}</span>

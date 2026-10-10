@@ -4,6 +4,7 @@ import { skillLabel } from '@/curriculum/skills'
 import { gradeItem } from '@/engine/quizGrade'
 import { useProgress } from '@/store/progress'
 import { Card, Pill, PrimaryButton, SecondaryButton, DocRefLink, ProgressBar } from '@/ui/common'
+import { hapticSuccess, hapticFailure } from '@/lib/haptics'
 import type { Item } from '@/curriculum/types'
 
 function shuffledIndices(n: number, seed: string): number[] {
@@ -41,6 +42,8 @@ export function QuizRunner({ itemIds, onFinish }: QuizRunnerProps) {
     setRevealed(true)
     setCorrectCount((c) => c + (correct ? 1 : 0))
     recordItemAttempt(item.id, item.difficulty, correct)
+    if (correct) hapticSuccess()
+    else hapticFailure()
   }
 
   const handleNext = () => {
