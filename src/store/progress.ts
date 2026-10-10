@@ -127,26 +127,25 @@ function isYesterday(dayStr: string, todayStr: string): boolean {
   return t.getTime() - d.getTime() === 24 * 60 * 60 * 1000
 }
 
-/** 스킬별 숙련도(0~100)를 계산한다. itemAttempts는 item.skills를 통해, labAttempts는 호출부에서 넘긴 skills로 매핑한다. */
+/**
+ * 스킬별 숙련도(0~100) = 완료율. 그 스킬에 연결된 모든 문항·실습 각각의 "최근 시도가 정답/통과였는가"를 모아
+ * engine/mastery.ts로 넘긴다 — 한 번도 안 푼 항목도 빈 배열로 포함해야 분모(전체 개수)가 정확해진다.
+ */
 export function computeMasteryBySkill(state: Pick<ProgressState, 'itemAttempts' | 'labAttempts'>): Record<SkillId, number> {
-  const quizBySkill = new Map<SkillId, AttemptRecord[]>()
+  const quizBySkill = new Map<SkillId, AttemptRecord[][]>()
   for (const item of ALL_ITEMS) {
-    const attempts = state.itemAttempts[item.id]
-    if (!attempts) continue
     for (const skill of item.skills) {
       const arr = quizBySkill.get(skill) ?? []
-      arr.push(...attempts)
+      arr.push(state.itemAttempts[item.id] ?? [])
       quizBySkill.set(skill, arr)
     }
   }
 
-  const labBySkill = new Map<SkillId, LabAttemptRecord[]>()
+  const labBySkill = new Map<SkillId, LabAttemptRecord[][]>()
   for (const lab of [...TERMINAL_SCENARIOS, ...FORGE_TASKS]) {
-    const attempts = state.labAttempts[lab.id]
-    if (!attempts) continue
     for (const skill of lab.skills) {
       const arr = labBySkill.get(skill) ?? []
-      arr.push(...attempts)
+      arr.push(state.labAttempts[lab.id] ?? [])
       labBySkill.set(skill, arr)
     }
   }
@@ -154,8 +153,8 @@ export function computeMasteryBySkill(state: Pick<ProgressState, 'itemAttempts' 
   const out: Partial<Record<SkillId, number>> = {}
   for (const skillMeta of SKILLS) {
     out[skillMeta.id] = computeSkillMastery({
-      quizAttempts: quizBySkill.get(skillMeta.id) ?? [],
-      labAttempts: labBySkill.get(skillMeta.id) ?? [],
+      quizAttemptsByItem: quizBySkill.get(skillMeta.id) ?? [],
+      labAttemptsByLab: labBySkill.get(skillMeta.id) ?? [],
     })
   }
   return out as Record<SkillId, number>

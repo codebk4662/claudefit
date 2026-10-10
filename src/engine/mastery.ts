@@ -1,6 +1,8 @@
 /**
- * 스킬별 숙련도(0~100) 계산.
- * mastery = 0.6 * 퀴즈 정답률(최근·난이도 가중) + 0.4 * 실습 통과율
+ * 스킬별 숙련도(0~100) = 완료율.
+ * 그 스킬에 연결된 퀴즈 문항 + 실습 각각에 대해, "가장 최근 시도"가 정답/통과였는지만 본다.
+ * 즉 관련 문항·실습을 한 번씩 맞혀서 "진행"하면 바로 100%에 도달해 성취감을 주고,
+ * SRS 간격 반복(scheduler.ts)이 그 뒤로도 계속 복습을 유도하는 역할을 별도로 맡는다.
  */
 
 export interface AttemptRecord {
@@ -14,43 +16,25 @@ export interface LabAttemptRecord {
   at: number
 }
 
-/** 최근 기록에 더 큰 가중치 + 난이도가 높을수록 가중치 증가. 결과는 0~1. */
-export function weightedAccuracy(attempts: AttemptRecord[], recentWindow = 8): number {
-  if (attempts.length === 0) return 0
-  const recent = attempts.slice(-recentWindow)
-  let num = 0
-  let denom = 0
-  recent.forEach((a, i) => {
-    const recencyWeight = Math.pow(1.15, i) // 배열 뒤쪽(최근)일수록 큼
-    const w = recencyWeight * a.difficulty
-    num += w * (a.correct ? 1 : 0)
-    denom += w
-  })
-  return denom === 0 ? 0 : num / denom
-}
-
-export function labPassRate(attempts: LabAttemptRecord[], recentWindow = 5): number {
-  if (attempts.length === 0) return 0
-  const recent = attempts.slice(-recentWindow)
-  const passed = recent.filter((a) => a.passed).length
-  return passed / recent.length
+function isLatestSuccess<T extends { at: number }>(attempts: T[], wasSuccess: (a: T) => boolean): boolean {
+  if (attempts.length === 0) return false
+  const latest = attempts.reduce((a, b) => (b.at >= a.at ? b : a))
+  return wasSuccess(latest)
 }
 
 export interface MasteryInputs {
-  quizAttempts: AttemptRecord[]
-  labAttempts: LabAttemptRecord[]
+  /** 스킬에 연결된 퀴즈 문항 각각의 시도 기록 (한 번도 안 풀었으면 빈 배열) */
+  quizAttemptsByItem: AttemptRecord[][]
+  /** 스킬에 연결된 실습 각각의 시도 기록 */
+  labAttemptsByLab: LabAttemptRecord[][]
 }
 
-/** 둘 중 하나가 비어 있으면 있는 쪽만으로 계산한다 (실습이 없는 스킬도 점수가 나오도록) */
-export function computeSkillMastery({ quizAttempts, labAttempts }: MasteryInputs): number {
-  const hasQuiz = quizAttempts.length > 0
-  const hasLab = labAttempts.length > 0
-  if (!hasQuiz && !hasLab) return 0
+export function computeSkillMastery({ quizAttemptsByItem, labAttemptsByLab }: MasteryInputs): number {
+  const total = quizAttemptsByItem.length + labAttemptsByLab.length
+  if (total === 0) return 0
 
-  const quizScore = weightedAccuracy(quizAttempts)
-  const labScore = labPassRate(labAttempts)
+  const masteredQuiz = quizAttemptsByItem.filter((attempts) => isLatestSuccess(attempts, (a) => a.correct)).length
+  const masteredLab = labAttemptsByLab.filter((attempts) => isLatestSuccess(attempts, (a) => a.passed)).length
 
-  if (hasQuiz && hasLab) return Math.round((0.6 * quizScore + 0.4 * labScore) * 100)
-  if (hasQuiz) return Math.round(quizScore * 100)
-  return Math.round(labScore * 100)
+  return Math.round(((masteredQuiz + masteredLab) / total) * 100)
 }

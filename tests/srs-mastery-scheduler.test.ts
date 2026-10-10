@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { initialSrsCard, reviewCard, isDue } from '@/engine/srs'
-import { computeSkillMastery, weightedAccuracy, labPassRate } from '@/engine/mastery'
+import { computeSkillMastery } from '@/engine/mastery'
 import { pickDailyDrillItems } from '@/engine/scheduler'
 import type { Item } from '@/curriculum/types'
 
@@ -28,35 +28,37 @@ describe('srs', () => {
 })
 
 describe('mastery', () => {
-  it('정답률이 높고 최근 기록일수록 가중치가 크다', () => {
-    const allCorrect = weightedAccuracy([
-      { correct: true, difficulty: 2, at: 1 },
-      { correct: true, difficulty: 2, at: 2 },
-    ])
-    expect(allCorrect).toBe(1)
-
-    const recentWrong = weightedAccuracy([
-      { correct: true, difficulty: 2, at: 1 },
-      { correct: false, difficulty: 2, at: 2 },
-    ])
-    const recentRight = weightedAccuracy([
-      { correct: false, difficulty: 2, at: 1 },
-      { correct: true, difficulty: 2, at: 2 },
-    ])
-    expect(recentRight).toBeGreaterThan(recentWrong)
-  })
-
-  it('퀴즈와 실습을 0.6/0.4로 섞는다', () => {
+  it('연결된 문항·실습을 모두 최근 시도 기준으로 맞혔으면 100%다', () => {
     const score = computeSkillMastery({
-      quizAttempts: [{ correct: true, difficulty: 2, at: 1 }],
-      labAttempts: [{ passed: false, at: 1 }],
+      quizAttemptsByItem: [[{ correct: true, difficulty: 2, at: 1 }]],
+      labAttemptsByLab: [[{ passed: true, at: 1 }]],
     })
-    expect(score).toBe(60) // 0.6*1 + 0.4*0
+    expect(score).toBe(100)
   })
 
-  it('한쪽 기록이 없으면 있는 쪽만으로 계산한다', () => {
-    expect(computeSkillMastery({ quizAttempts: [], labAttempts: [{ passed: true, at: 1 }] })).toBe(100)
-    expect(labPassRate([])).toBe(0)
+  it('가장 최근 시도만 본다 — 오답 뒤에 정답을 내면 그 문항은 완료로 친다', () => {
+    const score = computeSkillMastery({
+      quizAttemptsByItem: [
+        [
+          { correct: false, difficulty: 2, at: 1 },
+          { correct: true, difficulty: 2, at: 2 },
+        ],
+      ],
+      labAttemptsByLab: [],
+    })
+    expect(score).toBe(100)
+  })
+
+  it('일부만 완료했으면 비율만큼만 채워진다', () => {
+    const score = computeSkillMastery({
+      quizAttemptsByItem: [[{ correct: true, difficulty: 2, at: 1 }], []],
+      labAttemptsByLab: [[{ passed: false, at: 1 }]],
+    })
+    expect(score).toBe(33) // 연결된 문항2+실습1=3개 중 1개만 최근 시도가 성공 → round(1/3*100)
+  })
+
+  it('연결된 문항·실습이 하나도 없으면 0이다', () => {
+    expect(computeSkillMastery({ quizAttemptsByItem: [], labAttemptsByLab: [] })).toBe(0)
   })
 })
 
