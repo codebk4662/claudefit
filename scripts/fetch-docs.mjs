@@ -66,23 +66,31 @@ function parseLlmsIndex(md) {
 
 const UA = { 'User-Agent': 'cc-dojo-doc-sync/1.0' }
 
+/**
+ * code.claude.com/docs/ko/<slug>.md 는 정상일 때 Content-Type: text/markdown 을 준다.
+ * 일부 문서(changelog → GitHub blob, claude-tag → Mintlify 페이지 등)는 외부 사이트로 리다이렉트되는데,
+ * 그 사이트가 .md 경로를 모르면 렌더링된 HTML 페이지로 200을 준다 — fetch()는 리다이렉트를 그대로
+ * 따라가므로 그 HTML이 마크다운인 양 저장되어 버린다. text/html 이 오면 복구를 시도한다:
+ * GitHub blob 페이지면 raw.githubusercontent.com으로, 그 외에는 최종 URL에 .md를 붙여 재시도한다
+ * (Mintlify 등 상당수가 페이지 URL + .md 로 원문 마크다운을 그대로 서빙한다).
+ */
 async function fetchText(url) {
   const res = await fetch(url, { headers: UA })
   if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${url}`)
 
-  // changelog처럼 일부 문서는 code.claude.com이 GitHub blob 페이지(렌더링된 HTML)로
-  // 리다이렉트한다 — fetch()가 그 리다이렉트를 따라가 버리면 마크다운 대신 HTML이 저장된다.
-  // raw.githubusercontent.com의 원문으로 다시 받는다.
-  const blobMatch = /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/.exec(res.url)
-  if (blobMatch) {
-    const [, owner, repo, rest] = blobMatch
-    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${rest}`
-    const rawRes = await fetch(rawUrl, { headers: UA })
-    if (!rawRes.ok) throw new Error(`${rawRes.status} ${rawRes.statusText} for ${rawUrl}`)
-    return rawRes.text()
-  }
+  const contentType = res.headers.get('content-type') ?? ''
+  if (!contentType.includes('text/html')) return res.text()
 
-  return res.text()
+  const blobMatch = /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/.exec(res.url)
+  const retryUrl = blobMatch
+    ? `https://raw.githubusercontent.com/${blobMatch[1]}/${blobMatch[2]}/${blobMatch[3]}`
+    : `${res.url.replace(/\/$/, '')}.md`
+
+  const retryRes = await fetch(retryUrl, { headers: UA })
+  if (!retryRes.ok) throw new Error(`${retryRes.status} ${retryRes.statusText} for ${retryUrl} (원래 ${url} 가 HTML을 반환함)`)
+  const retryType = retryRes.headers.get('content-type') ?? ''
+  if (retryType.includes('text/html')) throw new Error(`${retryUrl} 도 HTML을 반환함 — 마크다운을 찾지 못함 (원래 ${url})`)
+  return retryRes.text()
 }
 
 /** 검색 코퍼스용: HTML/마크다운 기호를 걷어낸 대략적인 평문으로 변환한다 (완벽한 변환 불필요, 토큰화 품질만 중요). */
