@@ -9,17 +9,18 @@ const NAV = [
   { to: '/drill', label: '데일리 드릴', tabLabel: '데일리 드릴', icon: '⚡' },
   { to: '/learn', label: '학습 트랙', tabLabel: '학습 트랙', icon: '📚' },
   { to: '/docs', label: '원문 라이브러리', tabLabel: '라이브러리', icon: '🔎' },
+  { to: '/updates', label: '업데이트 소식', tabLabel: '업데이트', icon: '🆕' },
 ] as const
 
 export function Layout() {
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] flex">
-      {/* 데스크톱 전용 사이드바 — 모바일은 하단 탭바가 같은 4개 목적지를 더 네이티브하게 대신한다 */}
+      {/* 데스크톱 전용 사이드바 — 모바일은 하단 탭바가 같은 목적지들을 더 네이티브하게 대신한다 */}
       <aside className="hidden md:block sticky top-0 h-screen w-64 shrink-0 border-r border-[var(--border)] bg-[var(--bg-raised)]">
         <div className="p-4 border-b border-[var(--border)] flex items-center gap-2.5">
           <Logo size={28} />
           <div>
-            <div className="font-display text-base leading-tight">클로드핏</div>
+            <div className="font-display text-base leading-tight">ClaudeFit</div>
             <p className="text-sm text-[var(--text-dim)] leading-tight">Claude Code 학습 트레이닝</p>
           </div>
         </div>
@@ -57,7 +58,7 @@ export function Layout() {
           style={{ paddingTop: 'calc(0.75rem + var(--safe-top))', paddingBottom: '0.75rem' }}
         >
           <Logo size={22} />
-          <div className="font-display text-base">클로드핏</div>
+          <div className="font-display text-base">ClaudeFit</div>
         </header>
 
         {/* 모바일 하단 탭바와 겹치지 않도록 여유 패딩 (세이프에어리어 포함) — 탭 라벨이 16px로 커진 만큼 늘림 */}

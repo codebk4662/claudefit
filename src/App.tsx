@@ -9,6 +9,7 @@ import { TerminalPage } from '@/features/terminal/TerminalPage'
 import { ForgePage } from '@/features/forge/ForgePage'
 import { DocsLibraryPage } from '@/features/docs/DocsLibraryPage'
 import { DocViewerPage } from '@/features/docs/DocViewerPage'
+import { UpdatesPage } from '@/features/updates/UpdatesPage'
 import { AppIntro } from '@/ui/AppIntro'
 import { BackButtonHandler } from '@/ui/BackButtonHandler'
 
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/forge/:taskId" element={<ForgePage />} />
           <Route path="/docs" element={<DocsLibraryPage />} />
           <Route path="/docs/:slug" element={<DocViewerPage />} />
+          <Route path="/updates" element={<UpdatesPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
