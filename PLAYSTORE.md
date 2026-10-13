@@ -7,7 +7,7 @@
 - [ ] 결제 프로필 등록 (유료 앱/인앱결제 계획이 없다면 생략 가능)
 
 ## 2. 새 앱 만들기
-- [ ] 앱 이름: `클로드핏` (또는 원하는 이름 — 스토어에 표시될 이름이라 자유롭게 변경 가능)
+- [ ] 앱 이름: `ClaudeFit` (또는 원하는 이름 — 스토어에 표시될 이름이라 자유롭게 변경 가능)
 - [ ] 기본 언어: 한국어
 - [ ] 앱/게임 구분: 앱, 무료
 
@@ -20,7 +20,7 @@
 - [ ] 긴 설명 (4000자 이내) — `store-assets/long-description.txt` (978자)
 - [ ] 앱 아이콘 512×512 PNG — `store-assets/icon-512.png`
 - [ ] 피처 그래픽 1024×500 PNG — `store-assets/feature-graphic.png`
-- [ ] 휴대폰 스크린샷 4장 — `store-assets/screenshots/01-dashboard.png` ~ `04-docs.png`
+- [ ] 휴대폰 스크린샷 5장 — `store-assets/screenshots/01-dashboard.png` ~ `05-docs.png`
 - [ ] 앱 카테고리: 교육(Education)
 
 ## 5. 개인정보처리방침 — `docs/privacy.html` 작성 완료, GitHub Pages 활성화만 하면 됨

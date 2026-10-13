@@ -7,7 +7,7 @@
 | `app-release.aab` | 패키지 업로드 | 서명 완료. **.gitignore 대상 — 저장소엔 없고 로컬에만 있음.** 재생성: `npm run build && npx cap sync android && cd android && ./gradlew bundleRelease` |
 | `icon-512.png` | 앱 아이콘 | 512×512, 알파 채널 없음 |
 | `feature-graphic.png` | 피처 그래픽 | 1024×500, 알파 채널 없음 |
-| `screenshots/01-dashboard.png` ~ `04-docs.png` | 휴대폰 스크린샷 | 1080×2400, 알파 채널 없음. 대시보드 / 학습 트랙 / 데일리 드릴 / 원문 라이브러리 순서 |
+| `screenshots/01-dashboard.png` ~ `05-docs.png` | 휴대폰 스크린샷 | 1080×1920, 알파 채널 없음. 대시보드 / 실습(터미널) / 학습 트랙 / 데일리 드릴 / 원문 라이브러리 순서. 헤드라인 카피를 입힌 마케팅용 합성본 — 원본 캡처는 `screenshots/raw/`에 보관 |
 | `short-description.txt` | 짧은 설명 | 49자 (80자 제한) |
 | `long-description.txt` | 긴 설명 | 978자 (4000자 제한) |
 
@@ -20,8 +20,8 @@ https://codebk4662.github.io/claudefit/privacy.html
 
 **업로드 전에 `docs/privacy.html` 맨 아래 "문의" 섹션의 이메일 플레이스홀더를 실제 연락처로 바꿔주세요.**
 
-## 스크린샷 비율 참고
-에뮬레이터 해상도(1080×2400, 약 20:9)를 그대로 썼습니다. Play Console이 업로드 시 자동으로 크롭/리사이즈를 안내하니, 업로드하다 거부되면 말씀해주세요 — 1080×1920(9:16)으로 다시 잘라드릴 수 있습니다.
+## 스크린샷 재생성
+원본은 `screenshots/raw/`(에뮬레이터로 캡처한 1080×2400 날것)에 보관되어 있고, `node scripts/generate-screenshot-marketing.mjs` → `npm run process:screenshots`로 헤드라인 카피가 입혀진 1080×1920(9:16) 최종본을 다시 만듭니다. 헤드라인 문구는 `scripts/generate-screenshot-marketing.mjs`의 `SLIDES` 배열에서 수정하세요.
 
 ## 아직 사람이 직접 해야 하는 것
 - Play Console 개발자 계정 등록 ($25)
