@@ -36,7 +36,7 @@ export function AppIntro() {
         className="font-display text-lg text-[#F3EEDF] transition-all duration-500 ease-out delay-100"
         style={{ opacity: shown ? 1 : 0, transform: shown ? 'translateY(0)' : 'translateY(4px)' }}
       >
-        클로드핏
+        ClaudeFit
       </div>
     </div>
   )

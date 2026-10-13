@@ -17,8 +17,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: '클로드핏(ClaudeFit) — Claude Code 학습 트레이닝',
-        short_name: '클로드핏',
+        name: 'ClaudeFit — Claude Code 학습 트레이닝',
+        short_name: 'ClaudeFit',
         description: 'Claude Code 공식 문서를 이론 + 실습 + 반복 복습으로 체득하는 학습 앱',
         theme_color: '#14130f',
         background_color: '#14130f',

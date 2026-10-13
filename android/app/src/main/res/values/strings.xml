@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">클로드핏</string>
-    <string name="title_activity_main">클로드핏</string>
+    <string name="app_name">ClaudeFit</string>
+    <string name="title_activity_main">ClaudeFit</string>
     <string name="package_name">com.ccdojo.app</string>
     <string name="custom_url_scheme">com.ccdojo.app</string>
 </resources>

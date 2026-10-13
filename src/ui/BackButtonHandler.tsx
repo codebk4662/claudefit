@@ -34,7 +34,7 @@ export function BackButtonHandler() {
 
   return (
     <ConfirmModal
-      title="클로드핏을 종료할까요?"
+      title="ClaudeFit을 종료할까요?"
       description="학습 진도는 기기에 그대로 저장되어 있어요."
       confirmLabel="종료"
       cancelLabel="취소"
